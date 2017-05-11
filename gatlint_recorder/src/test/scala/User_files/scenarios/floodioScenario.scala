@@ -1,20 +1,28 @@
 package User_files.scenarios
 
 import User_files.requests.floodioRequests
-import io.gatling.core.Predef.scenario
+import io.gatling.core.Predef._
+
+import com.typesafe.config.ConfigFactory
 
 class floodioScenario {
 
-  val requests = new floodioRequests();
+  val requests = new floodioRequests()
+
+  val conf = ConfigFactory.parseFile(new java.io.File("gatling.properties"))
 
   val scn = scenario("FloodIoSteps")
     .exec(requests.getMainPageRequest)
-    .pause()
+    .pause(conf.getInt("pause.minPause"), conf.getInt("pause.normalPause"))
+    .exec(requests.getStep2Page)
     .exec(requests.setAgeRequest)
-    .pause("10")
+    .pause(conf.getInt("pause.normalPause"), conf.getInt("pause.longPause"))
+    .exec(requests.getStep3Page)
     .exec(requests.setMaxValueRequest)
-    .pause("10")
+    .pause(conf.getInt("pause.minPause"), conf.getInt("pause.shortPause"))
+    .exec(requests.getStep4Page)
     .exec(requests.clickNextRequest)
-    .pause("10")
+    .pause(conf.getInt("pause.shortPause"), conf.getInt("pause.normalPause"))
+    .exec(requests.getStep5Page)
     .exec(requests.setTimeTokenRequest)
 }

@@ -34,22 +34,42 @@ class floodioRequests {
     "User-Agent" -> "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.96 Safari/537.36",
     "X-Requested-With" -> "XMLHttpRequest")
 
-  val getMainPageRequest = http("Get Main Page Request").get("/").headers(headers_0)
+  val getMainPageRequest = http("get_main_page_request").get("/").headers(headers_0)
+    .check(xpath(".//input[@name='authenticity_token']/@value").saveAs("token"))
+    .check(xpath(".//input[@name='challenger[step_id]']/@value").saveAs("step_id"))
 
-  val setMaxValueRequest = http("Set Max Value Request")
+  val getStep2Page = http("get_step_2_page").get("/step/2")
+    .headers(headers_4)
+    .check(xpath(".//input[@name='authenticity_token']/@value").saveAs("token"))
+    .check(xpath(".//input[@name='challenger[step_id]']/@value").saveAs("step_id"))
+
+  val getStep3Page = http("get_step_3_page").get("/step/3")
+    .headers(headers_4)
+    .check(xpath(".//input[@name='authenticity_token']/@value").saveAs("token"))
+    .check(xpath(".//input[@name='challenger[step_id]']/@value").saveAs("step_id"))
+
+  val getStep4Page = http("get_step_4_page").get("/step/4")
+    .headers(headers_4)
+    .check(xpath(".//input[@name='authenticity_token']/@value").saveAs("token"))
+    .check(xpath(".//input[@name='challenger[step_id]']/@value").saveAs("step_id"))
+
+  val getStep5Page = http("get_step_5_page").get("/step/5")
+    .headers(headers_4)
+    .check(xpath(".//input[@name='authenticity_token']/@value").saveAs("token"))
+    .check(xpath(".//input[@name='challenger[step_id]']/@value").saveAs("step_id"))
+
+  val setMaxValueRequest = http("set_max_value_request")
     .post("/start")
     .headers(headers_4)
     .formParam("utf8", "✓")
-    .check(xpath(".//input[@name='authenticity_token']/@value").saveAs("token"))
     .formParam("authenticity_token", "${token}")
-    .check(xpath(".//input[@name='challenger[step_id]']/@value").saveAs("step_id"))
     .formParam("challenger[step_id]", "${step_id}")
     .formParam("challenger[step_number]", "3")
     .formParam("challenger[largest_order]", "264")
     .formParam("challenger[order_selected]", "ZEVETTYyaHJDcVV3RmJzajNxc3ljUT09LS1BalFBazRYVXhuOEJQYml1Y29XRU1nPT0=--a75df043152f43b68df80e6d3dcd46aa64febab6")
     .formParam("commit", "Next")
 
-  val clickNextRequest = http("Just Click Next Request")
+  val clickNextRequest = http("just_click_next_request")
     .post("/start")
     .headers(headers_4)
     .formParam("utf8", "✓")
@@ -63,7 +83,7 @@ class floodioRequests {
       .get("/code")
       .headers(headers_8))
 
-  val setTimeTokenRequest = http("Set Time Token Request")
+  val setTimeTokenRequest = http("det_time_token_request")
     .post("/start")
     .headers(headers_4)
     .formParam("utf8", "✓")
@@ -76,7 +96,7 @@ class floodioRequests {
     .formParam("challenger[one_time_token]", "${timeToken}")
     .formParam("commit", "Next")
 
-  val setAgeRequest = http("Set Age Request")
+  val setAgeRequest = http("set_age_request")
     .post("/start")
     .headers(headers_4)
     .formParam("utf8", "✓")
