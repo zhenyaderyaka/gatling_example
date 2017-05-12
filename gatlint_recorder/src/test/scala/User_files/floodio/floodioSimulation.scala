@@ -1,11 +1,11 @@
 package User_files.floodio
 
-import User_files.scenarios.floodioScenario
+import User_files.scenarios.FloodioScenario
 import io.gatling.core.scenario.Simulation
 import io.gatling.core.Predef._
 import io.gatling.http.Predef._
 
-class floodioSimulation extends Simulation {
+class FloodioSimulation extends Simulation {
 
   val httpProtocol = http
     .baseURL("https://challengers.flood.io")
@@ -16,7 +16,7 @@ class floodioSimulation extends Simulation {
     .connectionHeader("keep-alive")
     .userAgentHeader("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.96 Safari/537.36")
 
-  val scenario = new floodioScenario()
+  val scenario = new FloodioScenario()
 
   setUp(scenario.scn.inject(atOnceUsers(1))).protocols(httpProtocol)
 
