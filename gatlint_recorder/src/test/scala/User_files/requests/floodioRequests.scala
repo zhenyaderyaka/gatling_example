@@ -3,7 +3,7 @@ package User_files.requests
 import io.gatling.core.Predef._
 import io.gatling.http.Predef._
 
-class FloodioRequests {
+object FloodioRequests {
 
   val headers_0 = Map(
     "Cache-Control" -> "max-age=0",
@@ -30,12 +30,8 @@ class FloodioRequests {
     .headers(headers_4)
     .check(regex("""<input name="authenticity_token" type="hidden" value="(.+?)" />""").find.saveAs("token"))
     .check(regex("""id="challenger_step_id" name="challenger\[step_id\]" type="hidden" value="(.+?)"""").find.saveAs("step_id"))
-    .check(regex("""<label class="collection_radio_buttons" for="(.+?)">(.+?)\</label\>""").findAll.saveAs("tableValues"))
-
-  val getTableValues = http("get_step_3_table_values").get("/step/3")
-    .check(regex("""<label class="collection_radio_buttons" for="(.+?)">${maxValue}</label>""").find.saveAs("maxToken"))
-  .check(regex("""<input class="radio_buttons optional" id="${maxToken}" name="challenger[order_selected]" type="radio" value="(.+?)" />""").find.saveAs("maxCheckBox"))
-
+    .check(regex("""<input class="radio_buttons optional" id="(.+?)" name="challenger\[order_selected\]" type="radio"""").findAll.saveAs("inputs"))
+    .check(regex("""class="collection_radio_buttons".*?>(\d+)\<""").findAll.saveAs("tableValues"))
 
   val getStep4Page = http("get_step_4_page").get("/step/4")
     .headers(headers_4)
@@ -46,7 +42,13 @@ class FloodioRequests {
     .headers(headers_4)
     .check(regex("""<input name="authenticity_token" type="hidden" value="(.+?)" />""").find.saveAs("token"))
     .check(regex("""id="challenger_step_id" name="challenger\[step_id\]" type="hidden" value="(.+?)"""").find.saveAs("step_id"))
-    .check(regex("""<span class='token'>""").find.saveAs("timeToken"))
+
+  val getTimeToken = http("get_time_token").get("/code")
+    .headers(headers_4)
+    .check(jsonPath("$..code").find.saveAs("timeToken"))
+
+  val getDonePage = http("get_done_page_request").get("/done")
+  .check(regex("You're Done!").find)
 
   val setAgeRequest = http("set_age_request")
     .post("/start")
@@ -66,7 +68,7 @@ class FloodioRequests {
     .formParam("challenger[step_id]", "${step_id}")
     .formParam("challenger[step_number]", "3")
     .formParam("challenger[largest_order]", "${maxValue}")
-    .formParam("challenger[order_selected]", "${maxCheckBox}")
+    .formParam("challenger[order_selected]", "${input}")
     .formParam("commit", "Next")
 
   val clickNextRequest = http("just_click_next_request")
@@ -79,7 +81,7 @@ class FloodioRequests {
     .formParam("commit", "Next")
 
 
-  val setTimeTokenRequest = http("det_time_token_request")
+  val setTimeTokenRequest = http("set_time_token_request")
     .post("/start")
     .headers(headers_4)
     .formParam("utf8", "✓")

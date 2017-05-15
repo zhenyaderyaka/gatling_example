@@ -1,41 +1,42 @@
 package User_files.scenarios
 
-import User_files.requests.FloodioRequests
+import User_files.requests._
 import io.gatling.core.Predef._
+import io.gatling.http.Predef._
 import com.typesafe.config.ConfigFactory
 
 
-class FloodioScenario {
+object FloodioScenario {
 
-  val requests = new FloodioRequests()
   val agesFeeder = csv("data/ages.csv").random
-
 
   val conf = ConfigFactory.parseFile(new java.io.File("floodio.properties"))
 
-  val scn = scenario("FloodIoSteps")
-    .exec(requests.getMainPageRequest)
+  val scn = scenario("FloodIoSteps").feed(agesFeeder)
+    .exec(FloodioRequests.getMainPageRequest)
     .pause(conf.getInt("pause.minPause"), conf.getInt("pause.normalPause"))
-    .exec(requests.getStep2Page)
-    .exec(
-      session =>
-      session.set("age", feed(agesFeeder))
-    )
-    .exec(requests.setAgeRequest)
+    .exec(FloodioRequests.getStep2Page)
+    .exec(FloodioRequests.setAgeRequest)
     .pause(conf.getInt("pause.normalPause"), conf.getInt("pause.longPause"))
-    .exec(requests.getStep3Page)
+    .exec(FloodioRequests.getStep3Page)
     .exec(
       session => {
-        val max = session("tableValues").as[Array[Int]].max
-        session.set("maxValue", max)
+        val inputs = session("inputs").as[Seq[String]]
+        val inputValues = session("tableValues").as[List[String]].map(_.toInt).max
+
+        println("Max: " + inputValues)
+        session.set("input", inputs)
+        .set("maxValue", inputValues)
       }
-  )
-    .exec(requests.getTableValues)
-    .exec(requests.setMaxValueRequest)
-    .pause(conf.getInt("pause.minPause"), conf.getInt("pause.shortPause"))
-    .exec(requests.getStep4Page)
-    .exec(requests.clickNextRequest)
-    .pause(conf.getInt("pause.shortPause"), conf.getInt("pause.normalPause"))
-    .exec(requests.getStep5Page)
-    .exec(requests.setTimeTokenRequest)
+    )
+    .exec(FloodioRequests.setMaxValueRequest)
+      .pause(conf.getInt("pause.minPause"), conf.getInt("pause.shortPause"))
+      .exec(FloodioRequests.getStep4Page)
+      .exec(FloodioRequests.clickNextRequest)
+      .pause(conf.getInt("pause.shortPause"), conf.getInt("pause.normalPause"))
+      .exec(FloodioRequests.getStep5Page)
+      .exec(FloodioRequests.getTimeToken)
+      .exec(FloodioRequests.setTimeTokenRequest)
+      .pause(conf.getInt("pause.minPause"), conf.getInt("pause.shortPause"))
+      .exec(FloodioRequests.getDonePage)
 }
